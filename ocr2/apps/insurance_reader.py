@@ -340,6 +340,8 @@ class InsuranceReader:
     if syukbn not in self.analyzers: return syukbn
     self.analyzers[syukbn].fit(texts)
     self.info = self.analyzers[syukbn].info
+
+
     return syukbn
 
   def extract_info(self, key: str) -> str:

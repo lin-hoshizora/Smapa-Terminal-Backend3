@@ -4,7 +4,8 @@ import regex as re
 import numpy as np
 from .finders import RouFtnKbnFinder, KigoNumFinder
 from .analyzer_base import AnalyzerBase
-from .extract import get_insurer_num, get_num
+from .extract import get_insurer_num, get_num, get_date
+from .match import skkget_match
 
 
 def preprocess(texts: List[List[Any]]):
@@ -184,6 +185,26 @@ class MainAnalyzer(AnalyzerBase):
       self.info["HknjaNum"] = num[:6]
     else:
       self.info["HknjaNum"] = num[:8]
+  
+  def _get_SkkGetYmd(self, texts: List[List[Any]]):
+    """Truncates extracted HkanjaNum when necessary.
+
+    Args:
+      texts: OCR results in a list.
+    """
+    num = self.info.get("SkkGetYmd", None)
+    if num is not None: return
+    # print('skk',texts)
+    for txt in texts:
+      ret,text = skkget_match(txt[-1])
+      if ret:
+        skk=get_date(text)
+        self.info['SkkGetYmd'] = str(skk[0])
+        print(skk)
+        print(skk[0],self.info['SkkGetYmd'])
+        print(str(skk[0]),str(self.info['SkkGetYmd']))
+    
+
 
   def fit(self, texts: List[List[Any]]):
     """Extracts key information from OCR results.
@@ -197,4 +218,5 @@ class MainAnalyzer(AnalyzerBase):
     self._trim_hknjanum(texts)
     self._handle_branch(texts)
     self._handle_kigo_num(texts)
+    self._get_SkkGetYmd(texts)
     self._clean_kigo_num()
