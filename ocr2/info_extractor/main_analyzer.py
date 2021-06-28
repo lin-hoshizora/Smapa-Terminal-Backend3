@@ -203,7 +203,19 @@ class MainAnalyzer(AnalyzerBase):
         print(skk)
         print(skk[0],self.info['SkkGetYmd'])
         print(str(skk[0]),str(self.info['SkkGetYmd']))
+
+  def _get_HonKzkKbn(self, texts: List[List[Any]]):
+    key_words = ['家族', '被扶養者', '被保険者', '本人']
     
+    all_txt = ''
+    for txt in texts:
+      all_txt = all_txt + txt[-1]
+    for key_word in key_words:
+      if key_word in all_txt:
+        print(key_word)
+        self.info['HonKzkKbn'] = key_word
+        break
+
 
 
   def fit(self, texts: List[List[Any]]):
@@ -219,4 +231,5 @@ class MainAnalyzer(AnalyzerBase):
     self._handle_branch(texts)
     self._handle_kigo_num(texts)
     self._get_SkkGetYmd(texts)
+    self._get_HonKzkKbn(texts)
     self._clean_kigo_num()
