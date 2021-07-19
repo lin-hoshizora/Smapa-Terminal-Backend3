@@ -7,7 +7,11 @@ st_backend_web_tag="1.0"
 
 image_path=$1
 
-sudo docker stop $(sudo docker ps -q)
+# sudo docker stop $(sudo docker ps -q)
+echo "stop old content..."
+sudo docker stop $(sudo docker ps | awk '/(smapa_backend:.*|model_server:.*|scanner:.*|st-backend-web:.*)/{print $1}') 
+
+sed -i "s/\/home.*/\/home\/$(whoami)\/Smapa-Terminal-Backend3\/config:/" ./config/model_server_config.yaml
 
 IMG_FOLDER=$HOME/Smapa-Terminal-Backend3/ori_img
 if [ ! -d $IMG_FOLDER ]
@@ -29,11 +33,13 @@ echo "Starting model_server"
 #sudo docker run -d -v $CONFIG_FOLDER:/app/config -v /dev:/dev --privileged --network=host --restart=unless-stopped model_server:$model_server_tag
 
 echo "Starting scanner"
-#sudo docker run -d -v $IMG_FOLDER:$IMG_FOLDER -v $CONFIG_FOLDER:/app/config -v /dev:/dev -v /ori_img:/ori_img --privileged --network=host  scanner:$scanner_tag
-sudo docker run -d -v $HOME/Smapa-Terminal-Backend3/ori_img:$HOME/Smapa-Terminal-Backend3/ori_img -v $HOME/Smapa-Terminal-Backend3/config:/app/config -v /dev:/dev -v /ori_img:/ori_img --privileged --network=host --rm  scanner:1.0 bash -c "export SCANNER=0;/app/entrypoint.py"
+# sudo docker run -d -v $IMG_FOLDER:$IMG_FOLDER -v $CONFIG_FOLDER:/app/config -v /dev:/dev -v /ori_img:/ori_img --privileged --network=host  scanner:$scanner_tag
+sudo docker run -d -v $HOME/Smapa-Terminal-Backend3/ori_img:$HOME/Smapa-Terminal-Backend3/ori_img -v $HOME/Smapa-Terminal-Backend3/config:/app/config -v /dev:/dev -v /ori_img:/ori_img --privileged --network=host  scanner:1.0 bash -c "export SCANNER=0;/app/entrypoint.py"
+# sudo docker run -d -v $HOME/Smapa-Terminal-Backend3/ori_img:$HOME/Smapa-Terminal-Backend3/ori_img -v $HOME/Smapa-Terminal-Backend3/config:/app/config -v /dev:/dev -v /ori_img:/ori_img --privileged --network=host  scanner:1.0 bash -c "/app/entrypoint.py"
 echo "Starting smapa backend"
-sudo docker run --rm -d -v $HOME/Smapa-Terminal-Backend3/ocr2:/app/ocr2 -v /ori_img:/ori_img -v $DATA_FOLDER:$DATA_FOLDER -v $IMG_FOLDER:$IMG_FOLDER -v $CONFIG_FOLDER:/app/config -v /var/run/docker.sock:/var/run/docker.sock --privileged --rm --network=host smapa_backend:$smapa_backend_tag
+# sudo docker run -d -v $HOME/Smapa-Terminal-Backend3/ocr2:/app/ocr2 -v /ori_img:/ori_img -v $DATA_FOLDER:$DATA_FOLDER -v $IMG_FOLDER:$IMG_FOLDER -v $CONFIG_FOLDER:/app/config -v /var/run/docker.sock:/var/run/docker.sock --privileged --restart=unless-stopped --network=host smapa_backend:$smapa_backend_tag
+sudo docker run -d -v $HOME/Smapa-Terminal-Backend3/app:/app/ -v /ori_img:/ori_img -v $DATA_FOLDER:$DATA_FOLDER -v $IMG_FOLDER:$IMG_FOLDER -v $CONFIG_FOLDER:/app/config -v /var/run/docker.sock:/var/run/docker.sock --privileged --restart=unless-stopped --network=host smapa_backend:$smapa_backend_tag
 
-sudo docker run -d --rm -v $image_path:$image_path -v /home/user/Smapa-Terminal-Backend/ori_img:/app/ori_img --net=host st-backend-web:$st_backend_web_tag /bin/bash -c "cd /app && python3 server.py"
+sudo docker run -d --restart=always -v $image_path:$image_path -v /home/user/Smapa-Terminal-Backend/ori_img:/app/ori_img --net=host st-backend-web:$st_backend_web_tag /bin/bash -c "cd /app && python3 server.py"
 
 

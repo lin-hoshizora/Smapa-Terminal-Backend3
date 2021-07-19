@@ -1,3 +1,0 @@
-!SimpleFinder
-ef: !!python/name:ocr2.info_extractor.extract.get_pure_num ''
-mf: !!python/name:ocr2.info_extractor.match.kohi_num_match ''

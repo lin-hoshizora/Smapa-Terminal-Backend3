@@ -12,7 +12,7 @@ logger:
 # ==========================
 grpc:
   # サーバのIP
-  ip: 127.0.0.1
+  ip: 0.0.0.0
   remote: []
   # 最大スレッド数(アクセラレータの場合、原則1とする)
   max_workers: 1
@@ -105,7 +105,7 @@ docker:
   image: model_server:2.1
   detach: true
   volumes:
-    /home/smapa/Smapa-Terminal-Backend3/config:
+    /home/user/Smapa-Terminal-Backend3/config:
       bind: /app/config
       mode: rw
     /dev:

@@ -1,6 +1,5 @@
 #!/bin/bash
 smapa_base_path=$1
-
 user=$2
 
 sudo mkdir -p /home/$user/
